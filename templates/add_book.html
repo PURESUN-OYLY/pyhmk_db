@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Add book - Online Library{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1 style="padding: 10px;">Add book</h1>
+    <a href="{{ url_for('books') }}" class="btn btn-secondary">Return to list</a>
+</section>
+
+{% if errors %}
+<div class="alert alert-danger">
+    <ul>
+        {% for error in errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form method="POST" class="add-book-form">
+    <div class="form-grid">
+        <div class="form-section">
+            <h3>Information</h3>
+            
+            <div class="form-group">
+                <label for="title">Book name *</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="isbn">ISBN (13位) *</label>
+                <input type="text" id="isbn" name="isbn" maxlength="13" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="author_id">作者 *</label>
+                <select id="author_id" name="author_id" required>
+                    <option value="">请选择作者</option>
+                    {% for author in authors %}
+                    <option value="{{ author.id }}">{{ author.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="publication_year">出版年份</label>
+                    <input type="number" id="publication_year" name="publication_year" min="1000" max="2026">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pages">页数</label>
+                    <input type="number" id="pages" name="pages" min="1">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="price">价格 (元)</label>
+                <input type="number" id="price" name="price" step="0.01" min="0">
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>详细信息</h3>
+            
+            <div class="form-group">
+                <label for="publisher">出版社</label>
+                <input type="text" id="publisher" name="publisher">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="language">语言</label>
+                    <input type="text" id="language" name="language" value="中文">
+                </div>
+                
+                <div class="form-group">
+                    <label for="edition">版本</label>
+                    <input type="text" id="edition" name="edition" value="第1版">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="cover_type">装帧类型</label>
+                <select id="cover_type" name="cover_type">
+                    <option value="平装">平装</option>
+                    <option value="硬壳">硬壳</option>
+                    <option value="电子书">电子书</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>书籍分类</label>
+                <div class="checkbox-group">
+                    {% for category in categories %}
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="categories" value="{{ category.id }}">
+                        {{ category.name }}
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-section">
+        <h3>内容描述</h3>
+        
+        <div class="form-group">
+            <label for="description">内容简介</label>
+            <textarea id="description" name="description" rows="5"></textarea>
+        </div>
+    </div>
+    
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> 保存书籍
+        </button>
+        <button type="reset" class="btn btn-secondary">重置表单</button>
+    </div>
+</form>
+{% endblock %}

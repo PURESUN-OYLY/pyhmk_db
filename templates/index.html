@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Online Library{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Welcome to Online Library</h1>
+        <p>探索知识的海洋，发现阅读的乐趣</p>
+        <a href="{{ url_for('books') }}" class="btn btn-primary">浏览书籍</a>
+    </div>
+</section>
+
+<section class="stats">
+    <div class="stat-card">
+        <i class="fas fa-book"></i>
+        <h3>{{ total_books }}</h3>
+        <p>馆藏书籍</p>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-user-edit"></i>
+        <h3>{{ total_authors }}</h3>
+        <p>知名作者</p>
+    </div>
+    <div class="stat-card">
+        <i class="fas fa-tags"></i>
+        <h3>{{ total_categories }}</h3>
+        <p>书籍分类</p>
+    </div>
+</section>
+
+<section class="recent-books">
+    <h2>最新上架</h2>
+    <div class="books-grid">
+        {% for book in recent_books %}
+        <div class="book-card">
+            <div class="book-cover">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="book-info">
+                <h3>{{ book.title }}</h3>
+                <p class="author">{{ book.author.name }}</p>
+                <p class="price">¥{{ "%.2f"|format(book.price) }}</p>
+                <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-secondary">查看详情</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
