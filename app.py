@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from models import db, Author, Book, BookInfo, Category
 from datetime import datetime
 
+# for multiple ports
+import threading
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key-here'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
@@ -148,5 +151,21 @@ def delete_book(book_id):
     flash('书籍已删除', 'success')
     return redirect(url_for('books'))
 
+def listen_port_80():
+    app.run(debug=False, host='0.0.0.0', port=80, use_reloader=False)
+
+def listen_port_443():
+    # need dependency cryptography: pip install cryptography
+    app.run(debug=False, host='0.0.0.0', port=443, use_reloader=False, 
+            ssl_context=('/root/Python_Task/flask/cert/www.puresun.lib+2.pem', '/root/Python_Task/flask/cert/www.puresun.lib+2-key.pem'))
+
+# Now can use domain name: puresun.lib and www.puresun.lib
+# Use local https certificate
+# Use mkcert to generate certificate: pip install mkcert
+# Then run: mkcert puresun.lib www.puresun.lib
+#   github: https://github.com/FiloSottile/mkcert/releases
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+    t1 = threading.Thread(target=listen_port_80)
+    t2 = threading.Thread(target=listen_port_443)
+    t1.start()
+    t2.start()
