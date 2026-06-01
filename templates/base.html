@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Online Library{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
     <nav class="navbar">
         <div class="container">
@@ -18,22 +21,23 @@
                 <li><a href="{{ url_for('index') }}"><i class="fas fa-home"></i> Home</a></li>
                 <li><a href="{{ url_for('books') }}"><i class="fas fa-book"></i> Books</a></li>
                 <li><a href="{{ url_for('add_book') }}"><i class="fas fa-plus"></i> Add book</a></li>
-                <li><a href=""><i class="fas fa-user-plus"></i> Add author</a></li>
+                <li><a href="{{ url_for('add_author') }}"><i class="fas fa-user-plus"></i> Add author</a></li>
+                <li><a href="{{ url_for('add_category') }}"><i class="fas fa-tags"></i> Add category</a></li>
             </ul>
         </div>
     </nav>
 
     <main class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
-        
+
         {% block content %}{% endblock %}
     </main>
 
@@ -43,4 +47,5 @@
         </div>
     </footer>
 </body>
+
 </html>

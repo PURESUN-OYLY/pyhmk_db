@@ -142,6 +142,80 @@ def add_book():
     
     return render_template('add_book.html', authors=authors, categories=categories)
 
+# 添加作者表单
+@app.route('/add-author', methods=['GET', 'POST'])
+def add_author():
+    if request.method == 'POST':
+        errors = []
+        name = request.form['name'].strip()
+        birth_date_str = request.form['birth_date']
+        country = request.form['country'].strip()
+        biography = request.form['biography'].strip()
+
+        if not name:
+            errors.append('作者姓名不能为空')
+
+        # 处理日期格式转换
+        birth_date = None
+        if birth_date_str:
+            try:
+                birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                errors.append('出生日期格式不正确')
+
+        if errors:
+            return render_template('add_author.html', errors=errors)
+
+        try:
+            author = Author(
+                name=name,
+                birth_date=birth_date,
+                country=country,
+                biography=biography
+            )
+            db.session.add(author)
+            db.session.commit()
+            flash('作者添加成功！', 'success')
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+            errors.append(f'添加失败：{str(e)}')
+            return render_template('add_author.html', errors=errors)
+
+    return render_template('add_author.html')
+
+
+# 添加分类表单
+@app.route('/add-category', methods=['GET', 'POST'])
+def add_category():
+    if request.method == 'POST':
+        errors = []
+        name = request.form['name'].strip()
+        description = request.form['description'].strip()
+
+        if not name:
+            errors.append('分类名称不能为空')
+        
+        # 检查分类是否已存在
+        if Category.query.filter_by(name=name).first():
+            errors.append('该分类名称已存在')
+
+        if errors:
+            return render_template('add_category.html', errors=errors)
+
+        try:
+            category = Category(name=name, description=description)
+            db.session.add(category)
+            db.session.commit()
+            flash('分类添加成功！', 'success')
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+            errors.append(f'添加失败：{str(e)}')
+            return render_template('add_category.html', errors=errors)
+
+    return render_template('add_category.html')
+
 # 删除书籍（可选功能）
 @app.route('/delete-book/<int:book_id>', methods=['POST'])
 def delete_book(book_id):
