@@ -14,7 +14,7 @@ body {
 
 .container {
     max-width: 1200px;
-    margin: 0 auto;
+    /* margin: 0 auto; */
     padding: 0 20px;
 }
 
@@ -82,7 +82,8 @@ body {
 main {
     padding: 2rem 0;
     /* Need to minus footer and header */
-    min-height: calc(100vh - 100px - 2rem);
+    min-height: calc(100vh - 9rem - 2rem);
+    margin-bottom: 5rem;
 }
 
 /* 按钮 */
@@ -398,9 +399,9 @@ main {
     margin-bottom: 2rem;
 }
 
-.form-section {
+/* .form-section {
     margin-bottom: 2rem;
-}
+} */
 
 .form-section h3 {
     color: #2c3e50;
@@ -480,13 +481,17 @@ main {
     justify-content: flex-end;
 }
 
-/* 页脚 */
+/* footer */
 .footer {
+    /* make footer float to bottom */
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
     background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
     color: white;
     text-align: center;
     padding: 1rem 0;
-    margin-top: auto;
 }
 
 /* 响应式设计 */
