@@ -285,6 +285,11 @@ def list_categories():
     categories = Category.query.all()
     return render_template('categories.html', categories=categories)
 
+@app.route('/languages')
+def list_languages():
+    languages = Language.query.all()
+    return render_template('languages.html', languages=languages)
+
 # Edit category page
 @app.route('/edit-category/<int:category_id>', methods=['GET', 'POST'])
 def edit_category(category_id):

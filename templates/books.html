@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}书籍目录 - 智慧图书馆{% endblock %}
+{% block title %}Books List - Smart Library{% endblock %}
 
 {% block content %}
 <section class="page-header">
-    <h1>书籍目录</h1>
+    <h1 class="main_title">Book List</h1>
     <a href="{{ url_for('add_book') }}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> 添加新书籍
+        <i class="fas fa-plus"></i> Add Book
     </a>
 </section>
 
@@ -15,32 +15,24 @@
     <table class="books-table">
         <thead>
             <tr>
-                <th>书名</th>
-                <th>作者</th>
-                <th>出版年份</th>
-                <th>价格</th>
-                <th>状态</th>
-                <th>操作</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th style="min-width: 130px;">Publish Year</th>
+                <th>Price</th>
+                <th style="min-width: 170px;">Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for book in books %}
             <tr>
-                <td>{{ book.title }}</td>
+                <td><div><span>{{ book.title }}</span></div></td>
                 <td>{{ book.author.name }}</td>
-                <td>{{ book.publication_year }}</td>
-                <td>¥{{ "%.2f"|format(book.price) }}</td>
+                <td style="text-align: center;">{{ book.publish_year }}</td>
+                <td style="text-align: center;">¥{{ "%.2f"|format(book.price) }}</td>
                 <td>
-                    {% if book.available %}
-                    <span class="status available">可借</span>
-                    {% else %}
-                    <span class="status unavailable">已借出</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-small btn-info">详情</a>
-                    <form action="{{ url_for('delete_book', book_id=book.id) }}" method="POST" class="inline-form" onsubmit="return confirm('确定要删除这本书吗？');">
-                        <button type="submit" class="btn btn-small btn-danger">删除</button>
+                    <a href="{{ url_for('book_detail', book_id=book.id) }}" class="btn btn-small btn-info">Details</a>
+                    <form action="{{ url_for('delete_book', book_id=book.id) }}" method="POST" class="inline-form" onsubmit="return confirm('Are you sure you want to delete this book?');">
+                        <button type="submit" class="btn btn-small btn-danger">Delete</button>
                     </form>
                 </td>
             </tr>
@@ -50,8 +42,8 @@
     {% else %}
     <div class="empty-state">
         <i class="fas fa-book-open"></i>
-        <h3>暂无书籍</h3>
-        <p>点击上方按钮添加第一本书</p>
+        <h3>There are no available books available.</h3>
+        <p>Please add a book to get started, click the button above.</p>
     </div>
     {% endif %}
 </div>
