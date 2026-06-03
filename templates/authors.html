@@ -1,13 +1,10 @@
 {% extends "base.html" %}
-{% block title %}作者管理 - 智慧图书馆{% endblock %}
+{% block title %}Authors - Smart Library{% endblock %}
 
 {% block content %}
 <section class="page-header">
-    <ul>
-        <li><h1>作者管理列表</h1></li>
-        <a href="{{ url_for('add_author') }}" class="btn btn-primary"><i class="fas fa-plus"></i> 添加新作者</a>
-    </ul>
-    <!-- <h1>作者管理列表</h1> -->
+    <h1 class="main_title">Author List</h1>
+    <a href="{{ url_for('add_author') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Author</a>
 </section>
 
 <div class="books-container">
@@ -15,30 +12,34 @@
     <table class="books-table">
         <thead>
             <tr>
-                <th>作者姓名</th>
-                <th>国籍</th>
-                <th>出生日期</th>
-                <th>简介</th>
-                <th>操作</th>
+                <th>Name</th>
+                <th>Nationality</th>
+                <th>Birth Date</th>
+                <th>Biography</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             {% for author in authors %}
             <tr>
                 <td><strong>{{ author.name }}</strong></td>
-                <td>{{ author.country or '未知' }}</td>
-                <td>{{ author.birth_date or '未知' }}</td>
-                <td style="max-width: 300px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{ author.biography or '无' }}</td>
+                <td>{{ author.nationality.name or 'Unknown' }}</td>
+                <td>{{ author.birth_date or 'Unknown' }}</td>
+                <td style="max-width: 300px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{
+                    author.biography or 'None' }}</td>
                 <td>
-                    <a href="{{ url_for('edit_author', author_id=author.id) }}" class="btn btn-small btn-info">修改</a>
-                    <a href="{{ url_for('delete_author', author_id=author.id) }}" class="btn btn-small btn-danger">删除</a>
+                    <a href="{{ url_for('edit_author', author_id=author.id) }}" class="btn btn-small btn-info">Edit</a>
+                    <a href="{{ url_for('delete_author', author_id=author.id) }}"
+                        class="btn btn-small btn-danger">Delete</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
     {% else %}
-    <div class="empty-state"><h3>暂无作者数据</h3></div>
+    <div class="empty-state">
+        <h3>No authors available</h3>
+    </div>
     {% endif %}
 </div>
 {% endblock %}
