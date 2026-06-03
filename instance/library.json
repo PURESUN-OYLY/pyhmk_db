@@ -1,0 +1,86 @@
+{
+    "categories": [
+        {"name": "Fiction", "description": "A book of fiction novel"},
+        {"name": "Science Fiction", "description": "A book of science fiction novel"},
+        {"name": "History", "description": "A book of history"},
+        {"name": "Biography", "description": "A book of biography"},
+        {"name": "Travel", "description": "A book of travel"},
+        {"name": "Children's Books", "description": "A book of children"}
+    ],
+    "cover_types": [
+        "Paperback",
+        "Hardcover",
+        "E-book"
+    ],
+    "languages": [
+        "Chinese",
+        "English",
+        "French",
+        "German",
+        "Japanese"
+    ],
+    "authors": [
+        {
+            "name": "Cixin Liu",
+            "nationality": "Chinese",
+            "birth_date": "1963-06-23",
+            "is_alive": true,
+            "biography": "A famous author in China."
+        },
+        {
+            "name": "Haruki Murakami",
+            "nationality": "Japanese",
+            "birth_date": "1949-01-12",
+            "is_alive": true,
+            "biography": "A famous author in Japan."
+        },
+        {   
+            "name": "J.K. Rowling",
+            "nationality": "English",
+            "birth_date": "1965-07-31",
+            "is_alive": true,
+            "biography": "A famous author in England."
+        }
+    ],
+    "books": [
+        {
+            "title": "The Three Body Problem",
+            "author": "Cixin Liu",
+            "language": "Chinese",
+            "publish_year": "2010",
+            "category": "Science Fiction",
+            "description": "A science fiction novel about a three-body system.",
+            "cover_type": "Paperback",
+            "publisher": "Tiananmen Press",
+            "edition": "3",
+            "pages": "320",
+            "price": "98.00"
+        },
+        {
+            "title": "The Wind in the Willows",
+            "author": "Haruki Murakami",
+            "language": "Japanese",
+            "publish_year": "2005",
+            "category": "Fiction",
+            "description": "A story about a young boy and his father, and the journey they take on to find a lost book.",
+            "cover_type": "Paperback",
+            "publisher": "Tiananmen Press",
+            "edition": "1",
+            "pages": "240",
+            "price": "72.00"
+        },
+        {
+            "title": "Harry Potter and the Philosopher's Stone",
+            "author": "J.K. Rowling",
+            "language": "English",
+            "publish_year": "1997",
+            "category": "Fiction",
+            "description": "A story about a young wizard and his friends, and the journey they take on to find a magic book.",
+            "cover_type": "Paperback",
+            "publisher": "Bloomsbury Publishing Group",
+            "edition": "1",
+            "pages": "223",
+            "price": "12.00"
+        }
+    ]
+}

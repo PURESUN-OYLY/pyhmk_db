@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from models import db, Author, Book, BookInfo, Category
+from models import db, Author, Book, Category, Language, CoverType
 from datetime import datetime
+import os
+import sys
+import json
 
 # for multiple ports
 import threading
@@ -11,39 +14,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///library.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
-
-# 修复：使用 app_context() 替代 before_first_request
-with app.app_context():
-    db.create_all()
-    # 添加初始数据
-    if not Category.query.first():
-        categories = ['科幻小说', '文学小说', '历史', '科学', '哲学', '艺术']
-        for cat in categories:
-            db.session.add(Category(name=cat))
-        
-        author1 = Author(name='刘慈欣', birth_date=datetime(1963, 6, 23), country='中国', 
-                        biography='中国科幻小说代表作家，《三体》系列作者')
-        author2 = Author(name='村上春树', birth_date=datetime(1949, 1, 12), country='日本',
-                        biography='日本当代著名作家，作品风格独特')
-        db.session.add_all([author1, author2])
-        
-        book1 = Book(title='三体', isbn='9787536692930', publication_year=2008, 
-                    pages=302, price=23.00, author=author1,
-                    description='地球文明向宇宙发出的第一声啼鸣，改变了人类的命运')
-        book2 = Book(title='挪威的森林', isbn='9787532742929', publication_year=2001,
-                    pages=384, price=28.00, author=author2,
-                    description='关于青春、爱情与成长的经典小说')
-        
-        book1_info = BookInfo(publisher='重庆出版社', language='中文', edition='第1版',
-                            cover_type='平装', book=book1)
-        book2_info = BookInfo(publisher='上海译文出版社', language='中文', edition='第2版',
-                            cover_type='平装', book=book2)
-        
-        book1.categories.append(Category.query.filter_by(name='科幻小说').first())
-        book2.categories.append(Category.query.filter_by(name='文学小说').first())
-        
-        db.session.add_all([book1, book2, book1_info, book2_info])
-        db.session.commit()
 
 # Home page
 @app.route('/')
@@ -56,6 +26,76 @@ def index():
                           total_authors=total_authors,
                           total_categories=total_categories,
                           recent_books=recent_books)
+
+# Reset database
+def reset_db():
+    # backup database
+    if not os.path.exists('./instance/library.db'):
+        # if folder does not exist, create it
+        if not os.path.exists('./instance'):
+            os.makedirs('./instance')
+    else:
+        # copy database file to a backup file
+        os.system('cp ./instance/library.db ./instance/library.db.bak')
+
+    # check if json file exists
+    if not os.path.exists('./instance/library.json'):
+        return
+    
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+
+        # load json file
+        with open('./instance/library.json', 'r') as f:
+            data = json.load(f)
+            # print(data)
+
+            # add categories
+            for cat in data['categories']:
+                # print(cat)
+                db.session.add(Category(name=cat['name'], description=cat['description']))
+            db.session.commit()
+
+            # add languages
+            for lang in data['languages']:
+                # print(lang)
+                db.session.add(Language(name=lang))
+            db.session.commit()
+
+            # add cover types
+            for cover_type in data['cover_types']:
+                # print(cover_type)
+                db.session.add(CoverType(name=cover_type))
+            db.session.commit()
+
+            # add authors
+            for author in data['authors']:
+                # print(author)
+                # print(Language.query.filter_by(name=author['nationality']).first().id)
+                db.session.add(Author(name=author['name'], nationality_id=Language.query.filter_by(name=author['nationality']).first().id,
+                                      birth_date=datetime.strptime(author['birth_date'], '%Y-%m-%d'),
+                                      is_alive=author['is_alive'], biography=author['biography']))
+            db.session.commit()
+
+            # add books
+            for book in data['books']:
+                # print(book)
+                db.session.add(Book(title=book['title'], 
+                                    author_id=Author.query.filter_by(name=book['author']).first().id,
+                                    language_id=Language.query.filter_by(name=book['language']).first().id,
+                                    cover_type_id=CoverType.query.filter_by(name=book['cover_type']).first().id,
+                                    publisher=book['publisher'],
+                                    publish_year=int(book['publish_year']), 
+                                    edition=book['edition'],
+                                    category_id=Category.query.filter_by(name=book['category']).first().id,
+                                    description=book['description'],
+                                    pages=int(book['pages']), 
+                                    price=float(book['price']), 
+                                    ))
+            db.session.commit()
+
+
 
 # 书籍列表页
 @app.route('/books')
@@ -74,61 +114,52 @@ def book_detail(book_id):
 def add_book():
     authors = Author.query.all()
     categories = Category.query.all()
+    cover_types = CoverType.query.all()
+    languages = Language.query.all()
     
     if request.method == 'POST':
         # 表单验证
         errors = []
         title = request.form['title'].strip()
-        isbn = request.form['isbn'].strip()
         author_id = request.form['author_id']
-        publication_year = request.form['publication_year']
+        category_id = request.form['category_id']
+        language_id = request.form['language_id']
+        cover_type_id = request.form['cover_type_id']
+        publish_year = request.form['publish_year']
         pages = request.form['pages']
         price = request.form['price']
         description = request.form['description'].strip()
 
-        print(f"{title}, {isbn}, {author_id}, {publication_year}, {pages}, {description}")
+        # print(f"{title}, {author_id}, {publish_year}, {pages}, {description}")
         
         if not title:
-            errors.append('书名不能为空')
-        if not isbn or len(isbn) != 13:
-            errors.append('ISBN必须是13位数字')
-        if not author_id:
-            errors.append('请选择作者')
+            errors.append('Book title cannot be empty')
         
         if errors:
-            return render_template('add_book.html', authors=authors, 
-                                  categories=categories, errors=errors)
+            return render_template('add_book.html',
+                                   authors=authors, 
+                                   categories=categories,
+                                   cover_types=cover_types,
+                                   languages=languages,
+                                   errors=errors)
         
         # 创建书籍
         try:
             book = Book(
                 title=title,
-                isbn=isbn,
                 author_id=author_id,
-                publication_year=int(publication_year) if publication_year else None,
+                publish_year=int(publish_year) if publish_year else None,
                 pages=int(pages) if pages else None,
                 price=float(price) if price else None,
-                description=description
+                description=description,
+                category_id=category_id,
+                language_id=language_id,
+                cover_type_id=cover_type_id,
+                publisher=request.form['publisher'],
+                edition=request.form['edition'],
             )
-            
-            # 添加详细信息
-            book_info = BookInfo(
-                publisher=request.form['publisher'].strip(),
-                language=request.form['language'].strip(),
-                edition=request.form['edition'].strip(),
-                cover_type=request.form['cover_type'],
-                book=book
-            )
-            
-            # 添加类别
-            selected_categories = request.form.getlist('categories')
-            for cat_id in selected_categories:
-                category = Category.query.get(cat_id)
-                if category:
-                    book.categories.append(category)
-            
+
             db.session.add(book)
-            db.session.add(book_info)
             db.session.commit()
             
             flash('书籍添加成功！', 'success')
@@ -136,11 +167,17 @@ def add_book():
             
         except Exception as e:
             db.session.rollback()
-            errors.append(f'添加失败：{str(e)}')
-            return render_template('add_book.html', authors=authors, 
-                                  categories=categories, errors=errors)
+            # book_info = f"Book title: {title}, Author: {author_id}, Language: {request.form['language']}, Cover type: {request.form['cover_type']}, Category: {request.form['category']}, Publish year: {publish_year}, Pages: {pages}, Price: {price}, Description: {description}"
+            # errors.append(f'Add book failed: {str(e)}, {book_info}')
+            errors.append(f'Add book failed: {str(e)}')
+            return render_template('add_book.html',
+                                   authors=authors, 
+                                   categories=categories,
+                                   cover_types=cover_types, 
+                                   languages=languages,
+                                   errors=errors)
     
-    return render_template('add_book.html', authors=authors, categories=categories)
+    return render_template('add_book.html', authors=authors, categories=categories, cover_types=cover_types, languages=languages)
 
 # 添加作者表单
 @app.route('/add-author', methods=['GET', 'POST'])
@@ -343,7 +380,12 @@ def listen_port_443():
 # Then run: mkcert puresun.lib www.puresun.lib
 #   github: https://github.com/FiloSottile/mkcert/releases
 if __name__ == '__main__':
-    t1 = threading.Thread(target=listen_port_80)
-    t2 = threading.Thread(target=listen_port_443)
-    t1.start()
-    t2.start()
+
+    if len(sys.argv) > 1 and sys.argv[1] == 'reset':
+        reset_db()
+        print('Database reset successfully.')
+    else:
+        t1 = threading.Thread(target=listen_port_80)
+        t2 = threading.Thread(target=listen_port_443)
+        t1.start()
+        t2.start()

@@ -20,104 +20,98 @@
 {% endif %}
 
 <form method="POST" class="add-book-form">
+    <h3>Information</h3>
     <div class="form-grid">
         <div class="form-section">
-            <h3>Information</h3>
-            
+
             <div class="form-group">
-                <label for="title">Book name *</label>
-                <input type="text" id="title" name="title" required>
+                <label for="title">Book title *</label>
+                <input type="text" id="title" name="title" required value="For test">
             </div>
-            
+
             <div class="form-group">
-                <label for="isbn">ISBN (13位) *</label>
-                <input type="text" id="isbn" name="isbn" maxlength="13" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="author_id">作者 *</label>
+                <label for="author_id">Author *</label>
                 <select id="author_id" name="author_id" required>
-                    <option value="">请选择作者</option>
                     {% for author in authors %}
                     <option value="{{ author.id }}">{{ author.name }}</option>
                     {% endfor %}
                 </select>
             </div>
-            
+
             <div class="form-row">
                 <div class="form-group">
-                    <label for="publication_year">出版年份</label>
-                    <input type="number" id="publication_year" name="publication_year" min="1000" max="2026">
+                    <label for="publish_year">Publish year</label>
+                    <input type="number" id="publish_year" name="publish_year" min="1940" max="2026" value="{{2000}}">
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="pages">页数</label>
-                    <input type="number" id="pages" name="pages" min="1">
+                    <label for="pages">Pages</label>
+                    <input type="number" id="pages" name="pages" min="1" value="50">
                 </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="price">价格 (元)</label>
-                <input type="number" id="price" name="price" step="0.01" min="0">
+                <label for="price">Price (¥)</label>
+                <input type="number" id="price" name="price" step="1" min="0" value="12.00">
             </div>
+
         </div>
         
         <div class="form-section">
-            <h3>详细信息</h3>
-            
+                       
             <div class="form-group">
-                <label for="publisher">出版社</label>
-                <input type="text" id="publisher" name="publisher">
+                <label for="publisher">Publisher</label>
+                <input type="text" id="publisher" name="publisher" value="Publisher for test">
             </div>
-            
             <div class="form-row">
                 <div class="form-group">
-                    <label for="language">语言</label>
-                    <input type="text" id="language" name="language" value="中文">
+                    <label for="language_id">Language</label>
+                    <select id="language_id" name="language_id">
+                        {% for language in languages %}
+                        <option value="{{ language.id }}">{{ language.name }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                
+
                 <div class="form-group">
-                    <label for="edition">版本</label>
-                    <input type="text" id="edition" name="edition" value="第1版">
+                    <label for="edition">Edition</label>
+                    <input type="text" id="edition" name="edition" value="Volume 1st">
                 </div>
             </div>
-            
+
             <div class="form-group">
-                <label for="cover_type">装帧类型</label>
-                <select id="cover_type" name="cover_type">
-                    <option value="平装">平装</option>
-                    <option value="硬壳">硬壳</option>
-                    <option value="电子书">电子书</option>
+                <label for="cover_type_id">Cover type</label>
+                <select id="cover_type_id" name="cover_type_id">
+                    {% for ctype in cover_types %}
+                    <option value="{{ ctype.id }}">{{ ctype.name }}</option>
+                    {% endfor %}
                 </select>
             </div>
-            
+
             <div class="form-group">
-                <label>书籍分类</label>
-                <div class="checkbox-group">
+                <label for="category_id">Categories</label>
+                <select id="category_id" name="category_id">
                     {% for category in categories %}
-                    <label class="checkbox-label">
-                        <span>{{ category.name }}</span> <input type="checkbox" name="categories" value="{{ category.id }}">
-                    </label>
+                    <option value="{{ category.id }}">{{ category.name }}</option>
                     {% endfor %}
-                </div>
+                </select>
             </div>
         </div>
     </div>
-    
+
     <div class="form-section">
-        <h3>内容描述</h3>
-        
+        <h3>Content description</h3>
+
         <div class="form-group">
-            <!-- <label for="description">内容简介</label> -->
-            <textarea id="description" name="description" rows="5"></textarea>
+            <textarea id="description" name="description" rows="5" placeholder="Enter content description" value="Description for test"></textarea>
         </div>
     </div>
-    
+
     <div class="form-actions">
         <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> 保存书籍
+            <i class="fas fa-save"></i> Save book
         </button>
-        <button type="reset" class="btn btn-secondary">重置表单</button>
+        <button type="reset" class="btn btn-secondary">Reset form</button>
     </div>
 </form>
 {% endblock %}

@@ -271,6 +271,7 @@ main {
 .books-table th {
     background: linear-gradient(90deg, #2c3e50 0%, #34495e 100%);
     color: white;
+    text-align: center;
     font-weight: 500;
 }
 
@@ -392,23 +393,20 @@ main {
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-    margin-bottom: 2rem;
-}
-
-/* .form-section {
-    margin-bottom: 2rem;
-} */
-
-.form-section h3 {
+.add-book-form h3 {
     color: #2c3e50;
     margin-bottom: 1.5rem;
     border-bottom: 2px solid #3498db;
     padding-bottom: 0.5rem;
 }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
 
 .form-group {
     margin-bottom: 1rem;
@@ -437,6 +435,15 @@ main {
     font-family: inherit;
     font-size: 1rem;
     transition: border-color 0.3s ease;
+}
+
+.form-group input,
+.form-group textarea{
+    padding: 11px !important;
+}
+
+.form-group textarea{
+    resize: vertical;
 }
 
 .form-group input:focus,
