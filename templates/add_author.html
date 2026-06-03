@@ -4,50 +4,44 @@
 
 {% block content %}
 <section class="page-header">
-    <h1 style="padding: 10px;">添加新作者</h1>
-    <a href="{{ url_for('list_authors') }}" class="btn btn-secondary">返回作者列表</a>
+    <h1 class="main_title">Add author</h1>
+    <a href="javascript:history.back()" class="btn btn-secondary">Return</a>
 </section>
-
-{% if errors %}
-<div class="alert alert-danger">
-    <ul>
-        {% for error in errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
 
 <form method="POST" class="add-book-form" style="max-width: 600px; margin: 0 auto;">
     <div class="form-section">
-        <h3>作者基本信息</h3>
-        
+        <h3>Author's Basic Information</h3>
+
         <div class="form-group">
-            <label for="name">作者姓名 *</label>
-            <input type="text" id="name" name="name" required placeholder="请输入作者姓名">
+            <label for="name">Name *</label>
+            <input type="text" id="name" name="name" required placeholder="Enter author's name">
         </div>
-        
+
         <div class="form-group">
-            <label for="birth_date">出生日期</label>
+            <label for="birth_date">Birth Date</label>
             <input type="date" id="birth_date" name="birth_date">
         </div>
-        
+
         <div class="form-group">
-            <label for="country">国籍</label>
-            <input type="text" id="country" name="country" placeholder="例如：中国、日本">
+            <label for="nationality_id">Nationality</label>
+            <select id="nationality_id" name="nationality_id" required>
+                {% for nationality in nationalities %}
+                <option value="{{ nationality.id }}">{{ nationality.name }}</option>
+                {% endfor %}
+            </select>
         </div>
-        
+
         <div class="form-group">
-            <label for="biography">作者简介</label>
-            <textarea id="biography" name="biography" rows="5" placeholder="请输入作者生平或代表作简介..."></textarea>
+            <label for="biography">Biography</label>
+            <textarea id="biography" name="biography" rows="5" placeholder="Enter author's biography..."></textarea>
         </div>
     </div>
-    
+
     <div class="form-actions">
         <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> 保存作者
+            <i class="fas fa-save"></i> Save
         </button>
-        <button type="reset" class="btn btn-secondary">重置表单</button>
+        <button type="reset" class="btn btn-secondary">Reset</button>
     </div>
 </form>
 {% endblock %}
