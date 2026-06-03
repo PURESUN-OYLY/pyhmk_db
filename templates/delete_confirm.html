@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}警告：级联删除确认{% endblock %}
+
+{% block content %}
+<div style="max-width: 700px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    
+    <div class="alert alert-danger" style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 2.5rem;"></i>
+        <div>
+            <h2 style="margin: 0; font-size: 1.5rem;">危险操作警告！</h2>
+            <p style="margin: 5px 0 0 0;">您正在尝试删除{{ type }}：<strong>{{ item_name }}</strong>。</p>
+        </div>
+    </div>
+
+    <p style="font-size: 1.1rem; color: #555; line-height: 1.6;">
+        由于系统数据关联限制，删除该{{ type }}将会自动<strong>级联删除（一并抹除）</strong>以下受影响的书籍数据。此操作不可逆，请务必仔细核對：
+    </p>
+
+    <h3 style="margin: 20px 0 10px 0; padding-bottom: 5px; border-bottom: 2px solid #f5f7fa; color: #e74c3c;">
+        <i class="fas fa-book-dead"></i> 即将被同步删除的书籍 (共 {{ books|length }} 本)：
+    </h3>
+
+    {% if books %}
+    <div style="max-height: 250px; overflow-y: auto; background: #fafbfc; border: 1px solid #eaedf1; border-radius: 5px; padding: 10px 15px; margin-bottom: 30px;">
+        <ul style="padding-left: 20px; line-height: 1.8;">
+            {% for book in books %}
+            <li style="color: #2c3e50; margin-bottom: 5px;">
+                《<strong>{{ book.title }}</strong>》 <span style="color:#7f8c8d; font-size:0.9rem;">(ISBN: {{ book.isbn }})</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% else %}
+    <div style="background: #f4f9f4; color: #27ae60; padding: 15px; border-radius: 5px; margin-bottom: 30px;">
+        <i class="fas fa-check-circle"></i> 安全：当前该{{ type }}下没有关联任何书籍，可以安全删除。
+    </div>
+    {% endif %}
+
+    <form method="POST" style="display: flex; gap: 15px; justify-content: flex-end;">
+        <a href="{{ cancel_url }}" class="btn btn-secondary">
+            <i class="fas fa-undo"></i> 取消并返回
+        </a>
+        <button type="submit" class="btn btn-danger" style="background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);">
+            <i class="fas fa-trash-alt"></i> 确认级联删除
+        </button>
+    </form>
+</div>
+{% endblock %}

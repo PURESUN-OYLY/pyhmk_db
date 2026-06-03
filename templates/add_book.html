@@ -4,7 +4,7 @@
 
 {% block content %}
 <section class="page-header">
-    <h1 style="padding: 10px;">Add book</h1>
+    <h1 class="main_title">Add book</h1>
     <a href="{{ url_for('books') }}" class="btn btn-secondary">Return to list</a>
 </section>
 
@@ -95,8 +95,7 @@
                 <div class="checkbox-group">
                     {% for category in categories %}
                     <label class="checkbox-label">
-                        <input type="checkbox" name="categories" value="{{ category.id }}">
-                        {{ category.name }}
+                        <span>{{ category.name }}</span> <input type="checkbox" name="categories" value="{{ category.id }}">
                     </label>
                     {% endfor %}
                 </div>

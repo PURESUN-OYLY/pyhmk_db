@@ -45,7 +45,7 @@ with app.app_context():
         db.session.add_all([book1, book2, book1_info, book2_info])
         db.session.commit()
 
-# 主页
+# Home page
 @app.route('/')
 def index():
     total_books = Book.query.count()
@@ -184,6 +184,110 @@ def add_author():
 
     return render_template('add_author.html')
 
+# List authors page
+@app.route('/authors')
+def list_authors():
+    authors = Author.query.all()
+    return render_template('authors.html', authors=authors)
+
+# Edit author page
+@app.route('/edit-author/<int:author_id>', methods=['GET', 'POST'])
+def edit_author(author_id):
+    author = Author.query.get_or_404(author_id)
+    if request.method == 'POST':
+        author.name = request.form['name'].strip()
+        birth_date_str = request.form['birth_date']
+        author.country = request.form['country'].strip()
+        author.biography = request.form['biography'].strip()
+
+        if birth_date_str:
+            try:
+                author.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').date()
+            except ValueError:
+                return render_template('edit_author.html', author=author, errors=['日期格式错误'])
+        else:
+            author.birth_date = None
+
+        db.session.commit()
+        flash('作者信息更新成功！', 'success')
+        return redirect(url_for('list_authors'))
+        
+    return render_template('edit_author.html', author=author)
+
+# Delete author page
+@app.route('/delete-author/<int:author_id>', methods=['GET', 'POST'])
+def delete_author(author_id):
+    author = Author.query.get_or_404(author_id)
+    # 获取该作者名下的所有书籍
+    affected_books = author.books 
+
+    if request.method == 'POST':
+        try:
+            # 级联删除：先删书，再删作者
+            for book in affected_books:
+                db.session.delete(book)
+            db.session.delete(author)
+            db.session.commit()
+            flash(f'作者【{author.name}】及其关联的 {len(affected_books)} 本书籍已全部级联删除！', 'success')
+            return redirect(url_for('list_authors'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'删除失败：{str(e)}', 'danger')
+            return redirect(url_for('list_authors'))
+
+    # GET 请求：渲染确认删除预览页面
+    return render_template('delete_confirm.html', 
+                           type='作者', 
+                           item_name=author.name, 
+                           books=affected_books, 
+                           cancel_url=url_for('list_authors'))
+
+# List categories page
+@app.route('/categories')
+def list_categories():
+    categories = Category.query.all()
+    return render_template('categories.html', categories=categories)
+
+# Edit category page
+@app.route('/edit-category/<int:category_id>', methods=['GET', 'POST'])
+def edit_category(category_id):
+    category = Category.query.get_or_404(category_id)
+    if request.method == 'POST':
+        category.name = request.form['name'].strip()
+        category.description = request.form['description'].strip()
+        db.session.commit()
+        flash('分类信息更新成功！', 'success')
+        return redirect(url_for('list_categories'))
+        
+    return render_template('edit_category.html', category=category)
+
+# Delete category page
+@app.route('/delete-category/<int:category_id>', methods=['GET', 'POST'])
+def delete_category(category_id):
+    category = Category.query.get_or_404(category_id)
+    # 多对多关系中，通过 backref 的 dynamic 查询该分类下的书
+    affected_books = category.books.all()
+
+    if request.method == 'POST':
+        try:
+            # 级联删除该分类下的所有书
+            for book in affected_books:
+                db.session.delete(book)
+            db.session.delete(category)
+            db.session.commit()
+            flash(f'分类【{category.name}】及其关联的 {len(affected_books)} 本书籍已全部级联删除！', 'success')
+            return redirect(url_for('list_categories'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'删除失败：{str(e)}', 'danger')
+            return redirect(url_for('list_categories'))
+
+    # GET 请求：渲染确认删除预览页面
+    return render_template('delete_confirm.html', 
+                           type='分类', 
+                           item_name=category.name, 
+                           books=affected_books, 
+                           cancel_url=url_for('list_categories'))
 
 # 添加分类表单
 @app.route('/add-category', methods=['GET', 'POST'])
