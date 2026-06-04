@@ -118,7 +118,7 @@ def add_book():
     languages = Language.query.all()
     
     if request.method == 'POST':
-        # 表单验证
+        # Validate form data
         errors = []
         title = request.form['title'].strip()
         author_id = request.form['author_id']
@@ -143,7 +143,7 @@ def add_book():
                                    languages=languages,
                                    errors=errors)
         
-        # 创建书籍
+        # Create book instance
         try:
             book = Book(
                 title=title,
@@ -179,26 +179,26 @@ def add_book():
     
     return render_template('add_book.html', authors=authors, categories=categories, cover_types=cover_types, languages=languages)
 
-# 添加作者表单
+# add author form
 @app.route('/add-author', methods=['GET', 'POST'])
 def add_author():
     if request.method == 'POST':
         errors = []
         name = request.form['name'].strip()
         birth_date_str = request.form['birth_date']
-        country = request.form['country'].strip()
+        nationality_id = request.form['nationality_id'].strip()
         biography = request.form['biography'].strip()
 
         if not name:
-            errors.append('作者姓名不能为空')
+            errors.append('Author name cannot be empty')
 
-        # 处理日期格式转换
+        # Process birth date
         birth_date = None
         if birth_date_str:
             try:
                 birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').date()
             except ValueError:
-                errors.append('出生日期格式不正确')
+                errors.append('Invalid birth date format')
 
         if errors:
             return render_template('add_author.html', errors=errors)
@@ -207,25 +207,25 @@ def add_author():
             author = Author(
                 name=name,
                 birth_date=birth_date,
-                country=country,
+                nationality_id=nationality_id,
                 biography=biography
             )
             db.session.add(author)
             db.session.commit()
-            flash('作者添加成功！', 'success')
-            return redirect(url_for('index'))
+            flash('Author added successfully!', 'success')
+            return redirect(url_for('list_authors'))
+        
         except Exception as e:
             db.session.rollback()
-            errors.append(f'添加失败：{str(e)}')
+            errors.append(f'Add author failed: {str(e)}')
             return render_template('add_author.html', errors=errors)
 
-    return render_template('add_author.html')
+    return render_template('add_author.html', nationalities=Language.query.all())
 
 # List authors page
 @app.route('/authors')
 def list_authors():
-    authors = Author.query.all()
-    return render_template('authors.html', authors=authors)
+    return render_template('authors.html', authors=Author.query.all())
 
 # Edit author page
 @app.route('/edit-author/<int:author_id>', methods=['GET', 'POST'])
@@ -234,22 +234,22 @@ def edit_author(author_id):
     if request.method == 'POST':
         author.name = request.form['name'].strip()
         birth_date_str = request.form['birth_date']
-        author.country = request.form['country'].strip()
+        author.nationality_id = int(request.form['nationality_id'].strip())
         author.biography = request.form['biography'].strip()
 
         if birth_date_str:
             try:
                 author.birth_date = datetime.strptime(birth_date_str, '%Y-%m-%d').date()
             except ValueError:
-                return render_template('edit_author.html', author=author, errors=['日期格式错误'])
+                return render_template('edit_author.html', author=author, errors=['Invalid birth date format'])
         else:
             author.birth_date = None
 
         db.session.commit()
-        flash('作者信息更新成功！', 'success')
+        flash('Author updated successfully!', 'success')
         return redirect(url_for('list_authors'))
         
-    return render_template('edit_author.html', author=author)
+    return render_template('edit_author.html', author=author, nationalities=Language.query.all())
 
 # Delete author page
 @app.route('/delete-author/<int:author_id>', methods=['GET', 'POST'])

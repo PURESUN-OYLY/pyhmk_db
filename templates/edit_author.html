@@ -1,31 +1,45 @@
 {% extends "base.html" %}
+
+{% block title %}Edit Author - Online Library{% endblock %}
+
 {% block content %}
 <section class="page-header">
-    <h1>修改作者信息：{{ author.name }}</h1>
+    <h1 class="main_title">Edit Author: {{ author.name }}</h1>
+    <a href="javascript:history.back()" class="btn btn-secondary">Return</a>
 </section>
 
 <form method="POST" class="add-book-form" style="max-width: 600px; margin: 0 auto;">
     <div class="form-section">
+        <h3>Author's Basic Information</h3>
+
         <div class="form-group">
-            <label for="name">作者姓名 *</label>
+            <label for="name">Name *</label>
             <input type="text" id="name" name="name" value="{{ author.name }}" required>
         </div>
+        
         <div class="form-group">
-            <label for="birth_date">出生日期</label>
+            <label for="birth_date">Birth Date</label>
             <input type="date" id="birth_date" name="birth_date" value="{{ author.birth_date }}">
         </div>
+
         <div class="form-group">
-            <label for="country">国籍</label>
-            <input type="text" id="country" name="country" value="{{ author.country or '' }}">
+            <label for="nationality_id">Nationality</label>
+            <select id="nationality_id" name="nationality_id" required>
+                {% for nationality in nationalities %}
+                <option value="{{ nationality.id }}" {% if nationality.id == author.nationality_id %}selected{% endif %}>{{ nationality.name }}</option>
+                {% endfor %}
+            </select>
         </div>
+    
         <div class="form-group">
-            <label for="biography">作者简介</label>
+            <label for="biography">Biography</label>
             <textarea id="biography" name="biography" rows="5">{{ author.biography }}</textarea>
         </div>
     </div>
+
     <div class="form-actions">
-        <button type="submit" class="btn btn-primary">保存修改</button>
-        <a href="{{ url_for('list_authors') }}" class="btn btn-secondary">取消</a>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{{ url_for('list_authors') }}" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
 {% endblock %}
