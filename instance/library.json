@@ -13,11 +13,11 @@
         "E-book"
     ],
     "languages": [
-        "Chinese",
-        "English",
-        "French",
-        "German",
-        "Japanese"
+        {"name": "Chinese", "description": "A language spoken in China"},
+        {"name": "English", "description": "English spoken in the world as a second language"},
+        {"name": "French", "description": "A language spoken in France"},
+        {"name": "German", "description": "A language spoken in Germany"},
+        {"name": "Japanese", "description": "A language spoken in Japan"}
     ],
     "authors": [
         {

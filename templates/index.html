@@ -6,8 +6,8 @@
 <section class="hero">
     <div class="hero-content">
         <h1>Welcome to Online Library</h1>
-        <p>探索知识的海洋，发现阅读的乐趣</p>
-        <a href="{{ url_for('books') }}" class="btn btn-primary">浏览书籍</a>
+        <p>Explore the ocean of knowledge and discover the joy of reading</p>
+        <a href="{{ url_for('books') }}" class="btn btn-primary">Browse Books</a>
     </div>
 </section>
 
@@ -15,22 +15,22 @@
     <div class="stat-card">
         <i class="fas fa-book"></i>
         <h3>{{ total_books }}</h3>
-        <p>馆藏书籍</p>
+        <p>Books</p>
     </div>
     <div class="stat-card">
         <i class="fas fa-user-edit"></i>
         <h3>{{ total_authors }}</h3>
-        <p>知名作者</p>
+        <p>Authors</p>
     </div>
     <div class="stat-card">
         <i class="fas fa-tags"></i>
         <h3>{{ total_categories }}</h3>
-        <p>书籍分类</p>
+        <p>Categories</p>
     </div>
 </section>
 
 <section class="recent-books">
-    <h2>最新上架</h2>
+    <h2>New Releases</h2>
     <div class="books-grid">
         {% for book in recent_books %}
         <div class="book-card">
