@@ -255,26 +255,29 @@ def edit_author(author_id):
 @app.route('/delete-author/<int:author_id>', methods=['GET', 'POST'])
 def delete_author(author_id):
     author = Author.query.get_or_404(author_id)
-    # 获取该作者名下的所有书籍
+    # Get all books in the author's books relationship
     affected_books = author.books 
 
     if request.method == 'POST':
         try:
-            # 级联删除：先删书，再删作者
+            # Cascade delete all books in the author's books relationship
+            # delete book first
             for book in affected_books:
                 db.session.delete(book)
+
+            # delete author last
             db.session.delete(author)
             db.session.commit()
-            flash(f'作者【{author.name}】及其关联的 {len(affected_books)} 本书籍已全部级联删除！', 'success')
+            flash(f'Author {author.name} and its {len(affected_books)} books have been deleted successfully!', 'success')
             return redirect(url_for('list_authors'))
         except Exception as e:
             db.session.rollback()
-            flash(f'删除失败：{str(e)}', 'danger')
+            flash(f'Delete failed: {str(e)}', 'danger')
             return redirect(url_for('list_authors'))
 
-    # GET 请求：渲染确认删除预览页面
+    # GET request, render delete confirm page
     return render_template('delete_confirm.html', 
-                           type='作者', 
+                           type='author', 
                            item_name=author.name, 
                            books=affected_books, 
                            cancel_url=url_for('list_authors'))
@@ -336,7 +339,7 @@ def delete_category(category_id):
 
     # GET request, render delete confirm page
     return render_template('delete_confirm.html', 
-                           type='Category', 
+                           type='category', 
                            item_name=category.name, 
                            books=affected_books, 
                            cancel_url=url_for('list_categories'))
