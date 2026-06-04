@@ -4,40 +4,30 @@
 
 {% block content %}
 <section class="page-header">
-    <h1 style="padding: 10px;">添加新书籍分类</h1>
-    <a href="{{ url_for('index') }}" class="btn btn-secondary">返回首页</a>
+    <h1 class="main-title">Add New Category</h1>
+    <a href="javascript:history.back()" class="btn btn-secondary">Return</a>
 </section>
-
-{% if errors %}
-<div class="alert alert-danger">
-    <ul>
-        {% for error in errors %}
-        <li>{{ error }}</li>
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
 
 <form method="POST" class="add-book-form" style="max-width: 600px; margin: 0 auto;">
     <div class="form-section">
-        <h3>分类信息</h3>
+        <h3>Category Information</h3>
         
         <div class="form-group">
-            <label for="name">分类名称 *</label>
-            <input type="text" id="name" name="name" required placeholder="请输入分类名称，如：悬疑小说、计算机科学">
+            <label for="name">Category Name *</label>
+            <input type="text" id="name" name="name" required placeholder="Enter category name, e.g. Mystery, Science Fiction">
         </div>
         
         <div class="form-group">
-            <label for="description">分类描述</label>
-            <input type="text" id="description" name="description" placeholder="请输入该分类的简短描述">
+            <label for="description">Category Description</label>
+            <input type="text" id="description" name="description" placeholder="Enter short description of the category">
         </div>
     </div>
     
     <div class="form-actions">
         <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> 保存分类
+            <i class="fas fa-save"></i> Save Category
         </button>
-        <button type="reset" class="btn btn-secondary">重置表单</button>
+        <button type="reset" class="btn btn-secondary">Reset</button>
     </div>
 </form>
 {% endblock %}

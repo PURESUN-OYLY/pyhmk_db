@@ -109,7 +109,7 @@ def book_detail(book_id):
     book = Book.query.get_or_404(book_id)
     return render_template('book_detail.html', book=book)
 
-# 添加书籍表单
+# Add Book Form
 @app.route('/add-book', methods=['GET', 'POST'])
 def add_book():
     authors = Author.query.all()
@@ -295,10 +295,19 @@ def list_languages():
 def edit_category(category_id):
     category = Category.query.get_or_404(category_id)
     if request.method == 'POST':
-        category.name = request.form['name'].strip()
+        errors = []
+        if not Category.query.filter_by(name=request.form['name'].strip()).first():
+            errors.append('Category name not exists')
+
+        # category.name = request.form['name'].strip()
         category.description = request.form['description'].strip()
+        
+        # if errors, return to form
+        if errors:
+            return render_template('edit_category.html', category=category, errors=errors)
+        
         db.session.commit()
-        flash('分类信息更新成功！', 'success')
+        flash('Category updated successfully!', 'success')
         return redirect(url_for('list_categories'))
         
     return render_template('edit_category.html', category=category)
@@ -307,26 +316,27 @@ def edit_category(category_id):
 @app.route('/delete-category/<int:category_id>', methods=['GET', 'POST'])
 def delete_category(category_id):
     category = Category.query.get_or_404(category_id)
-    # 多对多关系中，通过 backref 的 dynamic 查询该分类下的书
-    affected_books = category.books.all()
+
+    # Fetch all books in the category's books relationship
+    affected_books = category.books
 
     if request.method == 'POST':
         try:
-            # 级联删除该分类下的所有书
+            # Delete all books in the category's books relationship
             for book in affected_books:
                 db.session.delete(book)
             db.session.delete(category)
             db.session.commit()
-            flash(f'分类【{category.name}】及其关联的 {len(affected_books)} 本书籍已全部级联删除！', 'success')
+            flash(f'Category {category.name} and its {len(affected_books)} books have been deleted successfully!', 'success')
             return redirect(url_for('list_categories'))
         except Exception as e:
             db.session.rollback()
-            flash(f'删除失败：{str(e)}', 'danger')
+            flash(f'Delete failed: {str(e)}', 'danger')
             return redirect(url_for('list_categories'))
 
-    # GET 请求：渲染确认删除预览页面
+    # GET request, render delete confirm page
     return render_template('delete_confirm.html', 
-                           type='分类', 
+                           type='Category', 
                            item_name=category.name, 
                            books=affected_books, 
                            cancel_url=url_for('list_categories'))
@@ -340,11 +350,11 @@ def add_category():
         description = request.form['description'].strip()
 
         if not name:
-            errors.append('分类名称不能为空')
+            errors.append('Category name cannot be empty')
         
         # 检查分类是否已存在
         if Category.query.filter_by(name=name).first():
-            errors.append('该分类名称已存在')
+            errors.append('Category name already exists')
 
         if errors:
             return render_template('add_category.html', errors=errors)
@@ -353,11 +363,11 @@ def add_category():
             category = Category(name=name, description=description)
             db.session.add(category)
             db.session.commit()
-            flash('分类添加成功！', 'success')
-            return redirect(url_for('index'))
+            flash('Category added successfully!', 'success')
+            return redirect(url_for('list_categories'))
         except Exception as e:
             db.session.rollback()
-            errors.append(f'添加失败：{str(e)}')
+            errors.append(f'Add failed: {str(e)}')
             return render_template('add_category.html', errors=errors)
 
     return render_template('add_category.html')

@@ -74,7 +74,7 @@ body {
     border-bottom: 1px solid #ecf0f1;
 }
 
-.main_title {
+.main-title {
     margin: 1rem 0;
 }
 
@@ -267,7 +267,6 @@ main {
     text-align: center;
     border-bottom: 1px solid #ecf0f1;
     min-width: 120px;
-    /* max-width: 250px; */
 }
 
 .books-table th {
@@ -280,8 +279,6 @@ main {
 .books-table td div{
     white-space: nowrap;
     overflow: hidden;
-    /* overflow-x: auto; */
-    /* scrollbar-width: none; */
     container-type: inline-size;
 }
 
@@ -327,7 +324,6 @@ main {
     margin-left: 5px;
 }
 
-/* 详情页 */
 .book-detail-container {
     display: grid;
     grid-template-columns: 300px 1fr;
@@ -379,10 +375,12 @@ main {
 }
 
 .category-tags {
+    width: fit-content;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 0.5rem;
+    align-items: left;
 }
 
 .category-tag {
@@ -392,6 +390,13 @@ main {
     border-radius: 20px;
     font-size: 0.875rem;
 }
+
+.category-introduction-td{
+    text-align: left !important;
+}
+
+/* .category-introduction-action{ */
+/* } */
 
 .description,
 .author-bio {

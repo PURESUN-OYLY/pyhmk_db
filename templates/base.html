@@ -24,8 +24,6 @@
             icon: "{{ category }}",
             confirmButtonText: 'OK'
         });
-        // console.log(message);
-        // console.log(category);
     });
 </script>
 {% endfor %}
@@ -34,20 +32,21 @@
 
 {% if errors %}
 <script>
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'bottom-start',
-        showConfirmButton: true,
-        timer: 4000,
-        timerProgressBar: true,
+    // wait for DOM to load before showing the alert
+    document.addEventListener('DOMContentLoaded', function () {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'bottom-start',
+            showConfirmButton: true,
+            timer: 4000,
+            timerProgressBar: true,
+        });
+        
+        Toast.fire({
+            icon: 'error',
+            title: "{{ errors[0] }}"
+        });
     });
-
-    Toast.fire({
-        icon: 'error',
-        title: "{{ errors[0] }}"
-    });
-    console.log(errors);
-    console.log(errors[0]);
 </script>
 {% endif %}
 
