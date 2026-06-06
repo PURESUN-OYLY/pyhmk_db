@@ -16,12 +16,14 @@
         Due to system data linkage restrictions, deleting this {{ type }} will automatically delete the following books:
     </p>
 
+
+    {% if books or authors %}
+    {% if books %}
     <h3>
         <i class="fas fa-book-dead"></i> These books will be deleted automatically: {{ books|length }} books.
     </h3>
-
-    {% if books %}
-    <div style="max-height: 250px; overflow-y: auto; background: #fafbfc; border: 1px solid #eaedf1; border-radius: 5px; padding: 10px 15px; margin-bottom: 30px;">
+    <div
+        style="max-height: 250px; overflow-y: auto; background: #fafbfc; border: 1px solid #eaedf1; border-radius: 5px; padding: 10px 15px; margin-bottom: 30px;">
         <ul style="padding-left: 20px; line-height: 1.8;">
             {% for book in books %}
             <li style="color: #2c3e50; margin-bottom: 5px;">
@@ -30,9 +32,26 @@
             {% endfor %}
         </ul>
     </div>
+    {% endif %}
+    {% if authors %}
+    <h3>
+        <i class="fas fa-book-dead"></i> These authors will be deleted automatically: {{ authors|length }} authors.
+    </h3>
+    <div
+        style="max-height: 250px; overflow-y: auto; background: #fafbfc; border: 1px solid #eaedf1; border-radius: 5px; padding: 10px 15px; margin-bottom: 30px;">
+        <ul style="padding-left: 20px; line-height: 1.8;">
+            {% for author in authors %}
+            <li style="color: #2c3e50; margin-bottom: 5px;">
+                <strong>"{{ author.name }}"</strong>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
     {% else %}
     <div style="background: #f4f9f4; color: #27ae60; padding: 15px; border-radius: 5px; margin-bottom: 30px;">
-        <i class="fas fa-check-circle"></i> Safe: {{ item_name }} does not have any linked books. You can delete it safely.
+        <i class="fas fa-check-circle"></i> Safe: {{ item_name }} does not have any linked books or authors. You can delete it
+        safely.
     </div>
     {% endif %}
 
@@ -40,7 +59,8 @@
         <a href="{{ cancel_url }}" class="btn btn-secondary">
             <i class="fas fa-undo"></i> Cancel
         </a>
-        <button type="submit" class="btn btn-danger" style="background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);">
+        <button type="submit" class="btn btn-danger"
+            style="background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);">
             <i class="fas fa-trash-alt"></i> Confirm
         </button>
     </form>

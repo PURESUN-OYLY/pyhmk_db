@@ -356,12 +356,21 @@ def edit_language(language_id):
 @app.route('/delete-language/<int:language_id>', methods=['GET', 'POST'])
 def delete_language(language_id):
     language = Language.query.get_or_404(language_id)
+    affected_books = language.books 
+    affected_authors = language.authors
     if request.method == 'POST':
         try:
+            del_books = Book.query.filter_by(language_id=language_id).all()
+            del_authors = Author.query.filter_by(nationality_id=language_id).all()
+            for book in del_books:
+                db.session.delete(book)
+            for author in del_authors:
+                db.session.delete(author)
             db.session.delete(language)
             db.session.commit()
             flash(f'Language {language.name} has been deleted successfully!', 'success')
             return redirect(url_for('list_languages'))
+        
         except Exception as e:
             db.session.rollback()
             flash(f'Delete failed: {str(e)}', 'danger')
@@ -371,7 +380,9 @@ def delete_language(language_id):
     return render_template('delete_confirm.html', 
                            type='language', 
                            item_name=language.name, 
-                           cancel_url=url_for('list_languages'))
+                           cancel_url=url_for('list_languages'),
+                           books=affected_books,
+                           authors=affected_authors)
 
 # Edit category page
 @app.route('/edit-category/<int:category_id>', methods=['GET', 'POST'])
