@@ -323,10 +323,35 @@ def add_language():
 @app.route('/edit-language/<int:language_id>', methods=['GET', 'POST'])
 def edit_language(language_id):
     language = Language.query.get_or_404(language_id)
-    # if request.method == 'POST':
-    #     errors = []
-    #     if not Language.query.filter_by(name=request.form['name'].strip()).first():
-    #         errors.append('Language name not exists')
+    language_name_before = language.name
+
+    if request.method == 'POST':
+        errors = []
+
+        language.name = request.form['name'].strip()
+        language.description = request.form['description'].strip()
+        
+        # Check if the language name is unique
+        if language_name_before != language.name and Language.query.filter_by(name=language.name).first():
+            errors.append('Language name already exists')
+
+        # Check if the language name is not empty
+        elif not language.name:
+            errors.append('Language name cannot be empty')
+        
+        # Check if the language description is not empty
+        elif not language.description:
+            errors.append('Language description cannot be empty')
+
+        # if errors, return to form
+        if errors:
+            return render_template('edit_language.html', language=language, errors=errors)
+        
+        db.session.commit()
+        flash('Language updated successfully!', 'success')
+        return redirect(url_for('list_languages'))
+
+    return render_template('edit_language.html', language=language)
 
 @app.route('/delete-language/<int:language_id>', methods=['GET', 'POST'])
 def delete_language(language_id):
