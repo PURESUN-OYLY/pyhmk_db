@@ -4,7 +4,7 @@
 
 {% block content %}
 <section class="page-header">
-    <h1 class="main_title">Book List</h1>
+    <h1 class="main-title">Book List</h1>
     <a href="{{ url_for('add_book') }}" class="btn btn-primary">
         <i class="fas fa-plus"></i> Add Book
     </a>
@@ -42,7 +42,7 @@
     {% else %}
     <div class="empty-state">
         <i class="fas fa-book-open"></i>
-        <h3>There are no available books available.</h3>
+        <h3>There are no books available.</h3>
         <p>Please add a book to get started, click the button above.</p>
     </div>
     {% endif %}

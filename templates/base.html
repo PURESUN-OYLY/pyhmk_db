@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css">
     <!-- New alert message -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </head>
 
@@ -17,16 +18,7 @@
 {% for category, message in messages %}
 <script>
     // wait for DOM to load before showing the alert
-    document.addEventListener('DOMContentLoaded', function () {
-        Swal.fire({
-            title: 'Smart Library',
-            text: "{{ message }}",
-            icon: "{{ category }}",
-            confirmButtonText: 'OK'
-        });
-        // console.log(message);
-        // console.log(category);
-    });
+    document.addEventListener('DOMContentLoaded', () => { show_message('Smart Library', '{{ message }}', '{{ category }}') });
 </script>
 {% endfor %}
 {% endif %}
@@ -34,20 +26,8 @@
 
 {% if errors %}
 <script>
-    const Toast = Swal.mixin({
-        toast: true,
-        position: 'bottom-start',
-        showConfirmButton: true,
-        timer: 4000,
-        timerProgressBar: true,
-    });
-
-    Toast.fire({
-        icon: 'error',
-        title: "{{ errors[0] }}"
-    });
-    console.log(errors);
-    console.log(errors[0]);
+    // wait for DOM to load before showing the alert
+    document.addEventListener('DOMContentLoaded', () => { show_toast('{{ errors[0] }}', 'error') });
 </script>
 {% endif %}
 

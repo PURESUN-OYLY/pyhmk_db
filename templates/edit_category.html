@@ -1,23 +1,31 @@
 {% extends "base.html" %}
+
+{% block title %}Edit Category - Online Library{% endblock %}
+
 {% block content %}
 <section class="page-header">
-    <h1>修改分类信息：{{ category.name }}</h1>
+    <h1 class="main-title">Edit Category</h1>
+    <a href="javascript:history.back()" class="btn btn-secondary">Return</a>
 </section>
 
-<form method="POST" class="add-book-form" style="max-width: 600px; margin: 0 auto;">
+<form method="POST" class="add-book-form">
     <div class="form-section">
+        <h3>Category Information</h3>
+
         <div class="form-group">
-            <label for="name">分类名称 *</label>
+            <label for="name">Category Name *</label>
             <input type="text" id="name" name="name" value="{{ category.name }}" required>
         </div>
+
         <div class="form-group">
-            <label for="description">分类描述</label>
-            <input type="text" id="description" name="description" value="{{ category.description or '' }}">
+            <label for="description">Category Description *</label>
+            <input type="text" id="description" name="description" value="{{ category.description or '' }}" required>
         </div>
     </div>
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary">保存修改</button>
-        <a href="{{ url_for('list_categories') }}" class="btn btn-secondary">取消</a>
-    </div>
+
+
+    {% with cancel_url=url_for('list_categories') %}
+    {% include "btn_save_cancel.html" %}
+    {% endwith %}
 </form>
 {% endblock %}

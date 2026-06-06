@@ -21,7 +21,7 @@ def index():
     total_books = Book.query.count()
     total_authors = Author.query.count()
     total_categories = Category.query.count()
-    recent_books = Book.query.order_by(Book.added_date.desc()).limit(3).all()
+    recent_books = Book.query.order_by(Book.added_date.desc()).limit(4).all()
     return render_template('index.html', total_books=total_books, 
                           total_authors=total_authors,
                           total_categories=total_categories,
@@ -60,7 +60,7 @@ def reset_db():
             # add languages
             for lang in data['languages']:
                 # print(lang)
-                db.session.add(Language(name=lang))
+                db.session.add(Language(name=lang['name'], description=lang['description']))
             db.session.commit()
 
             # add cover types
@@ -95,21 +95,19 @@ def reset_db():
                                     ))
             db.session.commit()
 
-
-
-# 书籍列表页
+# Book list page
 @app.route('/books')
 def books():
     all_books = Book.query.all()
     return render_template('books.html', books=all_books)
 
-# 书籍详情页
+# Book detail page
 @app.route('/book/<int:book_id>')
 def book_detail(book_id):
     book = Book.query.get_or_404(book_id)
     return render_template('book_detail.html', book=book)
 
-# 添加书籍表单
+# Add Book Form
 @app.route('/add-book', methods=['GET', 'POST'])
 def add_book():
     authors = Author.query.all()
@@ -162,7 +160,7 @@ def add_book():
             db.session.add(book)
             db.session.commit()
             
-            flash('书籍添加成功！', 'success')
+            flash('Book added successfully!', 'success')
             return redirect(url_for('books'))
             
         except Exception as e:
@@ -255,26 +253,29 @@ def edit_author(author_id):
 @app.route('/delete-author/<int:author_id>', methods=['GET', 'POST'])
 def delete_author(author_id):
     author = Author.query.get_or_404(author_id)
-    # 获取该作者名下的所有书籍
+    # Get all books in the author's books relationship
     affected_books = author.books 
 
     if request.method == 'POST':
         try:
-            # 级联删除：先删书，再删作者
+            # Cascade delete all books in the author's books relationship
+            # delete book first
             for book in affected_books:
                 db.session.delete(book)
+
+            # delete author last
             db.session.delete(author)
             db.session.commit()
-            flash(f'作者【{author.name}】及其关联的 {len(affected_books)} 本书籍已全部级联删除！', 'success')
+            flash(f'Author {author.name} and its {len(affected_books)} books have been deleted successfully!', 'success')
             return redirect(url_for('list_authors'))
         except Exception as e:
             db.session.rollback()
-            flash(f'删除失败：{str(e)}', 'danger')
+            flash(f'Delete failed: {str(e)}', 'danger')
             return redirect(url_for('list_authors'))
 
-    # GET 请求：渲染确认删除预览页面
+    # GET request, render delete confirm page
     return render_template('delete_confirm.html', 
-                           type='作者', 
+                           type='author', 
                            item_name=author.name, 
                            books=affected_books, 
                            cancel_url=url_for('list_authors'))
@@ -287,18 +288,140 @@ def list_categories():
 
 @app.route('/languages')
 def list_languages():
-    languages = Language.query.all()
-    return render_template('languages.html', languages=languages)
+    return render_template('languages.html', languages=Language.query.all())
+
+@app.route('/add-language', methods=['GET', 'POST'])
+def add_language():
+    if request.method == 'POST':
+        errors = []
+        name = request.form['name'].strip()
+        description = request.form['description'].strip()
+        
+        if not name:
+            errors.append('Language name cannot be empty')
+        
+        elif Language.query.filter_by(name=name).first():
+            errors.append('Language name already exists')
+
+        if errors:
+            return render_template('add_language.html', errors=errors)
+        
+        try:
+            language = Language(name=name, description=description)
+            db.session.add(language)
+            db.session.commit()
+            flash('Language added successfully!', 'success')
+            return redirect(url_for('list_languages'))
+        
+        except Exception as e:
+            db.session.rollback()
+            errors.append(f'Add language failed: {str(e)}')
+            return render_template('add_language.html', errors=errors)
+        
+    return render_template('add_language.html')
+
+@app.route('/edit-language/<int:language_id>', methods=['GET', 'POST'])
+def edit_language(language_id):
+    language = Language.query.get_or_404(language_id)
+    language_name_before = language.name
+
+    if request.method == 'POST':
+        errors = []
+
+        lan_name = request.form['name'].strip()
+        lan_description = request.form['description'].strip()
+
+        # Check if the language name is not empty
+        if not lan_name:
+            errors.append('Language name cannot be empty')
+        
+        # Check if the language description is not empty
+        elif not lan_description:
+            errors.append('Language description cannot be empty')
+        
+        # Check if the language name is unique
+        elif language_name_before != lan_name:
+            if Language.query.filter_by(name=lan_name).first():
+                errors.append('Language name already exists')
+
+        # if errors, return to form
+        if errors:
+            return render_template('edit_language.html', language=language, errors=errors)
+        
+        language.name = lan_name
+        language.description = lan_description
+        db.session.commit()
+
+        flash('Language updated successfully!', 'success')
+        return redirect(url_for('list_languages'))
+
+    return render_template('edit_language.html', language=language)
+
+@app.route('/delete-language/<int:language_id>', methods=['GET', 'POST'])
+def delete_language(language_id):
+    language = Language.query.get_or_404(language_id)
+    affected_books = language.books 
+    affected_authors = language.authors
+    if request.method == 'POST':
+        try:
+            del_books = Book.query.filter_by(language_id=language_id).all()
+            del_authors = Author.query.filter_by(nationality_id=language_id).all()
+            for book in del_books:
+                db.session.delete(book)
+            for author in del_authors:
+                db.session.delete(author)
+            db.session.delete(language)
+            db.session.commit()
+            flash(f'Language {language.name} has been deleted successfully!', 'success')
+            return redirect(url_for('list_languages'))
+        
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Delete failed: {str(e)}', 'danger')
+            return redirect(url_for('list_languages'))
+
+    # GET request, render delete confirm page
+    return render_template('delete_confirm.html', 
+                           type='language', 
+                           item_name=language.name, 
+                           cancel_url=url_for('list_languages'),
+                           books=affected_books,
+                           authors=affected_authors)
 
 # Edit category page
 @app.route('/edit-category/<int:category_id>', methods=['GET', 'POST'])
 def edit_category(category_id):
     category = Category.query.get_or_404(category_id)
+    category_name_before = category.name
+
     if request.method == 'POST':
-        category.name = request.form['name'].strip()
-        category.description = request.form['description'].strip()
+        errors = []
+
+        cat_name = request.form['name'].strip()
+        cat_description = request.form['description'].strip()
+
+        # Check if the category name is not empty
+        if not cat_name:
+            errors.append('Category name cannot be empty')
+
+        # Check if the category description is not empty
+        elif not cat_description:
+            errors.append('Category description cannot be empty')
+
+        # Check if the category name is unique
+        elif category_name_before != cat_name:
+            if Category.query.filter_by(name=cat_name).first():
+                errors.append('Category name already exists')
+
+        # if errors, return to form
+        if errors:
+            return render_template('edit_category.html', category=category, errors=errors)
+
+        category.name = cat_name
+        category.description = cat_description
+        
         db.session.commit()
-        flash('分类信息更新成功！', 'success')
+        flash('Category updated successfully!', 'success')
         return redirect(url_for('list_categories'))
         
     return render_template('edit_category.html', category=category)
@@ -307,31 +430,32 @@ def edit_category(category_id):
 @app.route('/delete-category/<int:category_id>', methods=['GET', 'POST'])
 def delete_category(category_id):
     category = Category.query.get_or_404(category_id)
-    # 多对多关系中，通过 backref 的 dynamic 查询该分类下的书
-    affected_books = category.books.all()
+
+    # Fetch all books in the category's books relationship
+    affected_books = category.books
 
     if request.method == 'POST':
         try:
-            # 级联删除该分类下的所有书
+            # Delete all books in the category's books relationship
             for book in affected_books:
                 db.session.delete(book)
             db.session.delete(category)
             db.session.commit()
-            flash(f'分类【{category.name}】及其关联的 {len(affected_books)} 本书籍已全部级联删除！', 'success')
+            flash(f'Category {category.name} and its {len(affected_books)} books have been deleted successfully!', 'success')
             return redirect(url_for('list_categories'))
         except Exception as e:
             db.session.rollback()
-            flash(f'删除失败：{str(e)}', 'danger')
+            flash(f'Delete failed: {str(e)}', 'danger')
             return redirect(url_for('list_categories'))
 
-    # GET 请求：渲染确认删除预览页面
+    # GET request, render delete confirm page
     return render_template('delete_confirm.html', 
-                           type='分类', 
+                           type='category', 
                            item_name=category.name, 
                            books=affected_books, 
                            cancel_url=url_for('list_categories'))
 
-# 添加分类表单
+# Add category page
 @app.route('/add-category', methods=['GET', 'POST'])
 def add_category():
     if request.method == 'POST':
@@ -340,11 +464,11 @@ def add_category():
         description = request.form['description'].strip()
 
         if not name:
-            errors.append('分类名称不能为空')
+            errors.append('Category name cannot be empty')
         
-        # 检查分类是否已存在
+        # Check if category name already exists
         if Category.query.filter_by(name=name).first():
-            errors.append('该分类名称已存在')
+            errors.append('Category name already exists')
 
         if errors:
             return render_template('add_category.html', errors=errors)
@@ -353,23 +477,97 @@ def add_category():
             category = Category(name=name, description=description)
             db.session.add(category)
             db.session.commit()
-            flash('分类添加成功！', 'success')
-            return redirect(url_for('index'))
+            flash('Category added successfully!', 'success')
+            return redirect(url_for('list_categories'))
         except Exception as e:
             db.session.rollback()
-            errors.append(f'添加失败：{str(e)}')
+            errors.append(f'Add failed: {str(e)}')
             return render_template('add_category.html', errors=errors)
 
     return render_template('add_category.html')
 
-# 删除书籍（可选功能）
+# Edit book page
+@app.route('/edit-book/<int:book_id>', methods=['GET', 'POST'])
+def edit_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    authors = Author.query.all()
+    languages = Language.query.all()
+    cover_types = CoverType.query.all()
+    categories = Category.query.all()
+
+    if request.method == 'POST':
+        errors = []
+        title = request.form['title'].strip()
+        publish_year = request.form['publish_year'].strip()
+        publisher = request.form['publisher'].strip()
+        edition = request.form['edition'].strip()
+        pages = request.form['pages'].strip()
+        price = request.form['price'].strip()
+        description = request.form['description'].strip()
+
+        # Check books parameters
+        if not title:
+            errors.append('Book title cannot be empty')
+        if not publish_year:
+            errors.append('Book publish year cannot be empty')
+        if not publisher:
+            errors.append('Book publisher cannot be empty')
+        if not edition:
+            errors.append('Book edition cannot be empty')
+        if not pages:
+            errors.append('Book pages cannot be empty')
+        if not price:
+            errors.append('Book price cannot be empty')
+        if not description:
+            errors.append('Book description cannot be empty')
+
+        if errors:
+            flash(f'{errors[0]}', 'danger')
+            return render_template('edit_book.html', book=book, errors=errors, authors=authors, languages=languages, cover_types=cover_types, categories=categories)
+
+        try:
+            print("Update book")
+            book.title = title
+            book.author_id = int(request.form['author_id'])
+            book.publish_year = int(publish_year)
+            book.publisher = publisher
+            book.edition = edition
+            book.language_id = int(request.form['language_id'])
+            book.cover_type_id = int(request.form['cover_type_id'])
+            book.category_id = int(request.form['category_id'])
+            book.pages = int(pages)
+            book.price = float(price)
+            book.description = description
+            db.session.commit()
+            flash('Book updated successfully!', 'success')
+            return redirect(url_for('books'))
+        
+        except Exception as e:
+            print(f'Update book failed: {str(e)}')
+            db.session.rollback()
+            errors.append(f'Update failed: {str(e)}')
+            return render_template('edit_book.html', book=book, errors=errors, authors=authors, languages=languages, cover_types=cover_types, categories=categories)
+        
+    return render_template('edit_book.html', book=book, authors=authors, languages=languages, cover_types=cover_types, categories=categories)
+
+# Delete book page
 @app.route('/delete-book/<int:book_id>', methods=['POST'])
 def delete_book(book_id):
-    book = Book.query.get_or_404(book_id)
-    db.session.delete(book)
-    db.session.commit()
-    flash('书籍已删除', 'success')
-    return redirect(url_for('books'))
+    try:
+        book = Book.query.get_or_404(book_id)
+        db.session.delete(book)
+        db.session.commit()
+
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Delete failed: {str(e)}', 'danger')
+        return redirect(url_for('books'))
+    
+    flash('Book deleted successfully!', 'success')
+    if request.form.get('page') == 'book_detail':
+        return redirect(url_for('index'))
+    else:
+        return redirect(url_for('books'))
 
 def listen_port_80():
     app.run(debug=False, host='0.0.0.0', port=80, use_reloader=False)
@@ -389,8 +587,10 @@ if __name__ == '__main__':
     if len(sys.argv) > 1 and sys.argv[1] == 'reset':
         reset_db()
         print('Database reset successfully.')
-    else:
+    elif len(sys.argv) > 1 and sys.argv[1] == 'listen-all':
         t1 = threading.Thread(target=listen_port_80)
         t2 = threading.Thread(target=listen_port_443)
         t1.start()
         t2.start()
+    else:
+        app.run(debug=True, host='0.0.0.0', port=80, use_reloader=False)

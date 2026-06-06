@@ -3,7 +3,7 @@
 
 {% block content %}
 <section class="page-header">
-    <h1 class="main_title">Author List</h1>
+    <h1 class="main-title">Author List</h1>
     <a href="{{ url_for('add_author') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Author</a>
 </section>
 
@@ -27,11 +27,14 @@
                 <td>{{ author.birth_date or 'Unknown' }}</td>
                 <td style="max-width: 300px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">{{
                     author.biography or 'None' }}</td>
-                <td>
-                    <a href="{{ url_for('edit_author', author_id=author.id) }}" class="btn btn-small btn-info">Edit</a>
-                    <a href="{{ url_for('delete_author', author_id=author.id) }}"
-                        class="btn btn-small btn-danger">Delete</a>
-                </td>
+
+                {% with
+                edit_url = url_for('edit_author', author_id=author.id),
+                delete_url = url_for('delete_author', author_id=author.id)
+                %}
+                {% include 'btns_edit_del.html' %}
+                {% endwith %}
+
             </tr>
             {% endfor %}
         </tbody>

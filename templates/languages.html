@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Languages - Smart Library{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1 class="main-title">Languages</h1>
+    <a href="{{ url_for('add_language') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Language</a>
+</section>
+
+<div class="books-container">
+    {% if languages %}
+    <table class="books-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for language in languages %}
+            <tr>
+                <td>{{ language.name }}</td>
+                <td>{{ language.description }}</td>
+                <!-- <td>
+                    <a href="{{ url_for('edit_language', language_id=language.id) }}" class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</a>
+                    <a href="{{ url_for('delete_language', language_id=language.id) }}" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i> Delete</a>
+                </td> -->
+                {% with
+                edit_url = url_for('edit_language', language_id=language.id),
+                delete_url = url_for('delete_language', language_id=language.id)
+                %}
+                {% include 'btns_edit_del.html' %}
+                {% endwith %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <h3>No languages available.</h3>
+    </div>
+    {% endif %}
+    {% endblock %}

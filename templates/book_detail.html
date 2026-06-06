@@ -7,70 +7,65 @@
     <div class="book-cover-large">
         <i class="fas fa-book"></i>
     </div>
-    
+
     <div class="book-details">
         <h1>{{ book.title }}</h1>
-        <p class="author">作者：{{ book.author.name }}</p>
-        
+        <p class="author">Author: {{ book.author.name }}</p>
+
         <div class="book-meta">
             <div class="meta-item">
-                <i class="fas fa-barcode"></i>
-                <span>ISBN：{{ book.isbn }}</span>
-            </div>
-            <div class="meta-item">
                 <i class="fas fa-calendar"></i>
-                <span>出版年份：{{ book.publication_year }}</span>
+                <span>Publication Year: {{ book.publish_year }}</span>
             </div>
             <div class="meta-item">
                 <i class="fas fa-file-alt"></i>
-                <span>页数：{{ book.pages }}</span>
+                <span>Pages: {{ book.pages }}</span>
             </div>
             <div class="meta-item">
-                <i class="fas fa-tag"></i>
-                <span>Price: ¥{{ "%.2f"|format(book.price) }}</span>
+                <i class="fas fa-yen-sign"></i>
+                <span>Price: {{ "%.2f"|format(book.price) }}</span>
             </div>
             <div class="meta-item">
                 <i class="fas fa-building"></i>
-                <span>出版社：{{ book.book_info.publisher }}</span>
+                <span>Publisher: {{ book.publisher }}</span>
             </div>
             <div class="meta-item">
                 <i class="fas fa-language"></i>
-                <span>语言：{{ book.book_info.language }}</span>
+                <span>Language: {{ book.language.name }}</span>
             </div>
             <div class="meta-item">
                 <i class="fas fa-bookmark"></i>
-                <span>Version: {{ book.book_info.edition }}</span>
+                <span>Version: {{ book.edition }}</span>
             </div>
             <div class="meta-item">
                 <i class="fas fa-book"></i>
-                <span>装帧：{{ book.book_info.cover_type }}</span>
+                <span>Cover Type: {{ book.cover_type.name }}</span>
+            </div>
+            <div class="meta-item">
+                <i class="fas fa-tags"></i>
+                <span>Categories: {{ book.category.name }}</span>
             </div>
         </div>
-        
-        <div class="categories">
-            <h3>分类：</h3>
-            <div class="category-tags">
-                {% for category in book.categories %}
-                <span class="category-tag">{{ category.name }}</span>
-                {% endfor %}
-            </div>
-        </div>
-        
+
         <div class="description">
-            <h3>内容简介</h3>
+            <h3>Description:</h3>
             <p>{{ book.description }}</p>
         </div>
-        
+
         <div class="author-bio">
-            <h3>作者简介</h3>
+            <h3>Author Bio:</h3>
             <p>{{ book.author.biography }}</p>
         </div>
-        
+
         <div class="action-buttons">
-            <a href="{{ url_for('books') }}" class="btn btn-secondary">返回列表</a>
-            <form action="{{ url_for('delete_book', book_id=book.id) }}" method="POST" class="inline-form" onsubmit="return confirm('确定要删除这本书吗？');">
-                <button type="submit" class="btn btn-danger">删除书籍</button>
+            <form action="{{ url_for('delete_book', book_id=book.id) }}" method="POST" class="inline-form"
+                onsubmit="return confirm('Delete this book?');">
+                <button type="submit" class="btn btn-danger">Delete Book</button>
+                <input type="hidden" name="page" value="book_detail">
             </form>
+            <a href="{{ url_for('edit_book', book_id=book.id) }}" class="btn btn-primary">Edit Book</a>
+            <a href="javascript:history.back()" class="btn btn-secondary">Return</a>
+
         </div>
     </div>
 </div>
