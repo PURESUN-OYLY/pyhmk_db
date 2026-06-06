@@ -12,21 +12,29 @@
 </section>
 
 <section class="stats">
-    <div class="stat-card">
-        <i class="fas fa-book"></i>
-        <h3>{{ total_books }}</h3>
-        <p>Books</p>
-    </div>
-    <div class="stat-card">
-        <i class="fas fa-user-edit"></i>
-        <h3>{{ total_authors }}</h3>
-        <p>Authors</p>
-    </div>
-    <div class="stat-card">
-        <i class="fas fa-tags"></i>
-        <h3>{{ total_categories }}</h3>
-        <p>Categories</p>
-    </div>
+    <a href="{{ url_for('books') }}" class="div-link">
+        <div class="stat-card">
+            <i class="fas fa-book"></i>
+            <h3>{{ total_books }}</h3>
+            <p>Books</p>
+        </div>
+    </a>
+
+    <a href="{{ url_for('list_authors') }}" class="div-link">
+        <div class="stat-card">
+            <i class="fas fa-user-edit"></i>
+            <h3>{{ total_authors }}</h3>
+            <p>Authors</p>
+        </div>
+    </a>
+
+    <a href="{{ url_for('list_categories') }}" class="div-link">
+        <div class="stat-card">
+            <i class="fas fa-tags"></i>
+            <h3>{{ total_categories }}</h3>
+            <p>Categories</p>
+        </div>
+    </a>
 </section>
 
 <section class="recent-books">

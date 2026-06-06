@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}Add book - Smart Library{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1 class="main-title">Add book</h1>
+    <a href="javascript:history.back();" class="btn btn-secondary">Return</a>
+    <!-- <a href="{{ url_for('books') }}" class="btn btn-secondary">Return to list</a> -->
+</section>
+
+{% if errors %}
+<div class="alert alert-danger">
+    <ul>
+        {% for error in errors %}
+        <li>{{ error }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<form method="POST" class="add-book-form" style="max-width: 1000px;">
+    <h3>Information</h3>
+    <div class="form-grid">
+        <div class="form-section">
+
+            <div class="form-group">
+                <label for="title">Book title *</label>
+                <input type="text" id="title" name="title" required value="{{ book.title }}">
+            </div>
+
+            <div class="form-group">
+                <label for="author_id">Author *</label>
+                <select id="author_id" name="author_id" required>
+                    {% for author in authors %}
+                    <option value="{{ author.id }}" {% if author.id == book.author_id %}selected{% endif %}>{{ author.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="publish_year">Publish year</label>
+                    <input type="number" id="publish_year" name="publish_year" min="1940" max="2026" value="{{ book.publish_year }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="pages">Pages</label>
+                    <input type="number" id="pages" name="pages" min="1" value="{{ book.pages }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Price (¥)</label>
+                <input type="number" id="price" name="price" step="1" min="0" value="{{ book.price }}">
+            </div>
+
+        </div>
+        
+        <div class="form-section">
+                       
+            <div class="form-group">
+                <label for="publisher">Publisher</label>
+                <input type="text" id="publisher" name="publisher" value="{{ book.publisher }}">
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="language_id">Language</label>
+                    <select id="language_id" name="language_id">
+                        {% for language in languages %}
+                        <option value="{{ language.id }}" {% if language.id == book.language_id %}selected{% endif %}>{{ language.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edition">Edition</label>
+                    <input type="text" id="edition" name="edition" value="{{ book.edition }}">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="cover_type_id">Cover type</label>
+                <select id="cover_type_id" name="cover_type_id">
+                    {% for ctype in cover_types %}
+                    <option value="{{ ctype.id }}" {% if ctype.id == book.cover_type_id %}selected{% endif %}>{{ ctype.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="category_id">Categories</label>
+                <select id="category_id" name="category_id">
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if category.id == book.category_id %}selected{% endif %}>{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h3>Content description</h3>
+
+        <div class="form-group">
+            <textarea id="description" name="description" rows="5" placeholder="Enter content description">{{ book.description }}</textarea>
+        </div>
+    </div>
+
+    {% include "btn_save_reset.html" %}
+    
+</form>
+{% endblock %}

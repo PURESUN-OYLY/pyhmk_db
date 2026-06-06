@@ -83,7 +83,7 @@ main {
     padding: 2rem 0;
     /* Need to minus footer and header */
     min-height: calc(100vh - 9rem - 2rem);
-    margin-bottom: 5rem;
+    margin-bottom: 5rem !important;
 }
 
 /* 按钮 */
@@ -328,11 +328,13 @@ main {
     margin-left: 5px;
 }
 
+
 .book-detail-container {
     display: grid;
     grid-template-columns: 300px 1fr;
     gap: 3rem;
     background: white;
+    margin-top: 2rem;
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
@@ -581,6 +583,39 @@ main {
     font-size: 1.1rem;
     color: #555;
     line-height: 1.6;
+}
+
+.alert-2nd-title {
+    max-height: 250px;
+    overflow-y: auto;
+    background: #fafbfc;
+    border: 1px solid #eaedf1;
+    border-radius: 5px;
+    padding: 10px 15px;
+    margin-bottom: 30px;
+}
+
+.alert-2nd-title ul {
+    padding-left: 20px;
+    line-height: 1.8;
+}
+
+.alert-2nd-title ul li {
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.alert-ok-cnt {
+    background: #f4f9f4;
+    color: #27ae60;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 30px;
+}
+
+.div-link{
+    text-decoration: none;
+    color: inherit;
 }
 
 /* Responsive Design */
